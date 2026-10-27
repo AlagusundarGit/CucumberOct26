@@ -1,0 +1,141 @@
+package com.lb.resources;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import com.lb.objectrepository.LoginValidationPage;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class CommonActions {
+	public static WebDriver driver;
+	public static WebDriverWait wait;
+	
+
+	//driver launch
+	public void driverLaunch(String url) {
+		WebDriverManager.chromedriver().setup();
+		
+		ChromeOptions options=new ChromeOptions();
+		options.addArguments("--headless=new");
+		options.addArguments("--start-maximized");
+		options.addArguments("--window-size=1920,1080");
+		driver = new ChromeDriver(options);
+		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		//driver.manage().window().maximize();
+		driver.get(url);
+	}
+	
+	//Site Launch
+	public void sitLaunch(String url) {
+		//driver.get(url);
+	}
+
+	// sendkeys
+	public void insertText(WebElement element, String input) {
+		element.sendKeys(input);
+	}
+	
+	// sendkeys and enter
+		public void insertTextEnter(WebElement element, String input) {
+			element.sendKeys(input,Keys.ENTER);
+		}
+
+	// click
+	public void button(WebElement element) {
+		element.click();
+	}
+	
+	//window handle
+	public void windowHandle() throws InterruptedException {
+		String parentURL=driver.getWindowHandle();
+		Set<String> childURL=driver.getWindowHandles();
+		for(String child: childURL) {
+			if(!parentURL.equals(child)) {
+				driver.switchTo().window(child);
+			}
+		}
+		Thread.sleep(2000);
+	}
+
+	// highlighter
+	public static void highlightElement(WebElement element) {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("arguments[0].style.backgroundColor='yellow';" + "arguments[0].style.border='3px solid red';",
+				element);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// Actions
+	public void moveToElemant(WebElement element) {
+		Actions a = new Actions(driver);
+		a.moveToElement(element).perform();
+		;
+	}
+
+	// Actions build() inside in perform() in Selenium 4
+	public void dragAndDrop(WebElement source, WebElement target) {
+		Actions a = new Actions(driver);
+		a.dragAndDrop(source, target).build().perform();
+	}
+
+	// Excel read and write
+	public static void excel(WebElement element) throws IOException {
+		// Write in Excel
+		File file = new File(".//Excel//Account.xlsx");
+		FileOutputStream f = new FileOutputStream(file);
+
+		XSSFWorkbook w = new XSSFWorkbook();
+		XSSFSheet sheet = w.createSheet("Account Details");
+
+		List<WebElement> accountDetails = wait.until(
+				ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//div[@class='column-secondary']//li")));
+		for (int i = 0; i < accountDetails.size(); i++) {
+			WebElement detail = accountDetails.get(i);
+			String name = detail.getText();
+
+			XSSFRow row = sheet.createRow(i);
+			XSSFCell cell = row.createCell(0);
+
+			cell.setCellValue(name);
+		}
+		w.write(f);
+		f.close();
+		w.close();
+
+		FileInputStream fi = new FileInputStream(file);
+		XSSFWorkbook wr = new XSSFWorkbook(fi);
+		XSSFSheet sheeti = wr.getSheet("Account Details");
+		XSSFCell celli = sheeti.getRow(2).getCell(0);
+
+		String accountEmail = celli.getStringCellValue();
+		System.out.println(accountEmail + " Excel write read done");
+		fi.close();
+		wr.close();
+	}
+}
