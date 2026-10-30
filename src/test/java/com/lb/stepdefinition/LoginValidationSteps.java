@@ -29,6 +29,8 @@ import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import com.lb.objectrepository.LoginValidationPage;
 
+
+
 public class LoginValidationSteps extends CommonActions {
 	
 	CommonActions ca=new CommonActions();
@@ -39,7 +41,6 @@ public class LoginValidationSteps extends CommonActions {
 
 	@Given("Launch the application")
 	public void launch_the_application() {
-		//ca.sitLaunch(url);
 		l=new LoginValidationPage();
 	}
 

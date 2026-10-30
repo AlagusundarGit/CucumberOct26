@@ -11,7 +11,7 @@ import io.cucumber.junit.CucumberOptions;
 					plugin = {"pretty","io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"},
 					monochrome = true,
 					dryRun = false,
-					tags = "@sanity")
+					tags = "@Regression")
 
 public class TestRunner {
 
