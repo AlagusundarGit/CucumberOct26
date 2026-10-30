@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -27,52 +28,95 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.lb.objectrepository.LoginValidationPage;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.Allure;
 
 public class CommonActions {
 	public static WebDriver driver;
 	public static WebDriverWait wait;
-	
 
-	//driver launch
+	// driver launch
 	public void driverLaunch(String url) {
+
+		try {
+			FileUtils.deleteDirectory(new File("allure-results"));
+		} catch (Exception e) {
+		}
+
 		WebDriverManager.chromedriver().setup();
-		
-		ChromeOptions options=new ChromeOptions();
+
+		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--headless=new");
-		options.addArguments("--start-maximized");
+		// options.addArguments("--start-maximized");
 		options.addArguments("--window-size=1920,1080");
 		driver = new ChromeDriver(options);
-		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-		//driver.manage().window().maximize();
+		wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+		// driver.manage().window().maximize();
 		driver.get(url);
 	}
-	
-	//Site Launch
+
+	// Site Launch
 	public void sitLaunch(String url) {
-		//driver.get(url);
+		// driver.get(url);
+	}
+
+	public void printValue(WebElement element) {
+		String value = element.getText();
+		System.out.println(value);
+		Allure.step("Verified value: " + value);
 	}
 
 	// sendkeys
 	public void insertText(WebElement element, String input) {
 		element.sendKeys(input);
 	}
-	
+
 	// sendkeys and enter
-		public void insertTextEnter(WebElement element, String input) {
-			element.sendKeys(input,Keys.ENTER);
-		}
+	public void insertTextEnter(WebElement element, String input) {
+		element.sendKeys(input, Keys.ENTER);
+	}
 
 	// click
 	public void button(WebElement element) {
 		element.click();
 	}
-	
-	//window handle
+
+	// get Text
+	public void getText(WebElement element) {
+		System.out.println(element.getText());
+	}
+
+	// scroll to element
+	public void scrollToElement(WebElement element) {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+	}
+
+	// hover
+	public void hover(WebElement element) {
+		Actions action = new Actions(driver);
+		action.moveToElement(element).pause(Duration.ofSeconds(2)).perform();
+	}
+
+	// size click
+	public void selectFirstAvailableSize(List<WebElement> elements) {
+
+		for (WebElement size : elements) {
+			System.out.println("Size: " + size.getText());
+
+			if (size.isDisplayed() && size.isEnabled()) {
+				scrollToElement(size);
+				highlightElement(size);
+				size.click();
+				break;
+			}
+		}
+	}
+
+	// window handle
 	public void windowHandle() throws InterruptedException {
-		String parentURL=driver.getWindowHandle();
-		Set<String> childURL=driver.getWindowHandles();
-		for(String child: childURL) {
-			if(!parentURL.equals(child)) {
+		String parentURL = driver.getWindowHandle();
+		Set<String> childURL = driver.getWindowHandles();
+		for (String child : childURL) {
+			if (!parentURL.equals(child)) {
 				driver.switchTo().window(child);
 			}
 		}
@@ -80,7 +124,8 @@ public class CommonActions {
 	}
 
 	// highlighter
-	public static void highlightElement(WebElement element) {
+	public void highlightElement(WebElement element) {
+		waitForElementVisible(element);
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("arguments[0].style.backgroundColor='yellow';" + "arguments[0].style.border='3px solid red';",
 				element);
@@ -102,6 +147,11 @@ public class CommonActions {
 	public void dragAndDrop(WebElement source, WebElement target) {
 		Actions a = new Actions(driver);
 		a.dragAndDrop(source, target).build().perform();
+	}
+
+	// wait
+	public void waitForElementVisible(WebElement element) {
+		wait.until(ExpectedConditions.visibilityOf(element));
 	}
 
 	// Excel read and write
