@@ -16,7 +16,7 @@ Feature: Login
   Scenario: Login the application one dim list
     When User enters valid username and password by one dim list
       | as@as.com |
-      | Test$12345 |
+      | Test$1234 |
     And User clicks Login
     Then User should be redirected to the home page
 
