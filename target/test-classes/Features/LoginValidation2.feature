@@ -6,7 +6,7 @@ Feature: Login
     And User clicks on Accept Cookies
     And User clicks on account
 
-  @sanity @ignore
+  @sanity
   Scenario: Login the application
     When User enters valid username and password
     And User clicks Login

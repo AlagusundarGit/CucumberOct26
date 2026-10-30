@@ -6,7 +6,7 @@ Feature: Login
     And User clicks on Accept Cookies
     And User clicks on account
 
-  @sanity
+  @sanity @smoke
   Scenario: Login the application
     When User enters valid username and password
     And User clicks Login
@@ -16,7 +16,7 @@ Feature: Login
   Scenario: Login the application one dim list
     When User enters valid username and password by one dim list
       | as@as.com |
-      | Test$1234 |
+      | Test$12345 |
     And User clicks Login
     Then User should be redirected to the home page
 
