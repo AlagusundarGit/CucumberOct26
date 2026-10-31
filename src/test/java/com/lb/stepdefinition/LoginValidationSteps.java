@@ -35,9 +35,8 @@ public class LoginValidationSteps extends CommonActions {
 	
 	CommonActions ca=new CommonActions();
 	LoginValidationPage l;
-	
-	public static String usernameCred = "alagusundar.sundar@knitwellgroup.com";
-	public static String passwordCred = "Test$1234";
+	public static String usernameCred;
+	public static String passwordCred;
 
 	@Given("Launch the application")
 	public void launch_the_application() {
@@ -66,13 +65,13 @@ public class LoginValidationSteps extends CommonActions {
 	public void user_enters_valid_username_and_password() {
 		wait.until(ExpectedConditions.visibilityOf(l.getEmail()));
 		ca.highlightElement(l.getEmail());
-		ca.insertText(l.getEmail(), usernameCred);
+		ca.insertText(l.getEmail(), ca.getProperty("username"));
 		wait.until(ExpectedConditions.elementToBeClickable(l.getContinueButton()));
 		ca.highlightElement(l.getContinueButton());
 		ca.button(l.getContinueButton());
 		wait.until(ExpectedConditions.visibilityOf(l.getPassword()));
 		ca.highlightElement(l.getPassword());
-		ca.insertText(l.getPassword(), passwordCred);
+		ca.insertText(l.getPassword(), ca.getProperty("password"));
 	}
 
 	@When("User clicks Login")

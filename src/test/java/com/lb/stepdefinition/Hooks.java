@@ -11,11 +11,11 @@ import io.cucumber.java.Scenario;
 
 public class Hooks extends CommonActions{
 	CommonActions ca=new CommonActions();
-	public static String url="https://storefront:lbbrand2022@sfqa.lanebryant.com/";
+	
 	@Before
 	public void beforeScenario() {
 		System.out.println("Before scenario");
-		ca.driverLaunch(url);		
+		ca.driverLaunch();		
 	}
 
 	@After

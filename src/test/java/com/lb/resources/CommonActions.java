@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
@@ -33,9 +34,21 @@ import io.qameta.allure.Allure;
 public class CommonActions {
 	public static WebDriver driver;
 	public static WebDriverWait wait;
+	
+	//Read config properties
+	public String getProperty(String key) {
+	    Properties prop = new Properties();
+	    try {
+	        FileInputStream fis =new FileInputStream("src/test/resources/config.properties");
+	        prop.load(fis);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return prop.getProperty(key);
+	}
 
 	// driver launch
-	public void driverLaunch(String url) {
+	public void driverLaunch() {
 
 		try {
 			FileUtils.deleteDirectory(new File("allure-results"));
@@ -45,18 +58,16 @@ public class CommonActions {
 		WebDriverManager.chromedriver().setup();
 
 		ChromeOptions options = new ChromeOptions();
+		if(getProperty("headless").equalsIgnoreCase("true")) {
 		options.addArguments("--headless=new");
+		}
 		// options.addArguments("--start-maximized");
 		options.addArguments("--window-size=1920,1080");
 		driver = new ChromeDriver(options);
-		wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+		int timeout=Integer.parseInt(getProperty("explicitWait"));
+		wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
 		// driver.manage().window().maximize();
-		driver.get(url);
-	}
-
-	// Site Launch
-	public void sitLaunch(String url) {
-		// driver.get(url);
+		driver.get(getProperty("url"));
 	}
 
 	public void printValue(WebElement element) {
